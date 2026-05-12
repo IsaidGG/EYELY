@@ -1,0 +1,1986 @@
+:: StoryTitle
+Diagnóstico Visual - OftalmoBot
+
+:: StoryData
+{
+  "ifid": "82C644F5-04D6-4AE9-9291-75810C5AD29E",
+  "format": "Harlowe",
+  "format-version": "3.3.9",
+  "start": "PantallaCero",
+  "zoom": 1
+}
+
+:: PantallaCero {"position":"300,100","size":"100,100"}
+<audio id="musicaMenu" src="sonido/fondo.mp3" autoplay loop></audio>
+(set: $juego_iniciado to false)
+
+
+<script>
+    // Guardamos la música del menú en la memoria global de la ventana
+    window.musicaMenu = document.getElementById('musicaMenu');
+    // Le bajamos un poquito el volumen para que no sature
+    if(window.musicaMenu) window.musicaMenu.volume = 0.5;
+</script>
+
+
+<div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #111; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+    <h1 style="color: #00bcd4; font-family: 'Segoe UI', sans-serif; letter-spacing: 5px; margin-bottom: 40px;">SISTEMA EYELY OS</h1>
+    <div class="pantalla-cero">
+        [[ INICIAR SISTEMA ->INICIO]]
+    </div>
+</div>
+
+:: INICIO {"position":"500,100","size":"100,100"}
+<div class="main-menu-card">
+
+  <div class="menu-header">
+    <img src="imagenes/logo.png" class="main-logo" alt="Logo Eyely">
+  </div>
+
+  <div class="menu-middle">
+    
+    <div class="robot-section">
+      <img src="imagenes/robot/menu/eyelyidlegif.gif" class="robot-animado" alt="Oftalmo-Bot">
+    </div>
+    
+    <div class="jugar-section">
+      [[JUGAR->JuegoMain]]
+    </div>
+
+  </div>
+
+  <div class="menu-footer">
+    <div class="footer-icons-wrapper">
+      
+      <div class="footer-icon-item">
+        [[<img src="imagenes/terminos.png" class="menu-icon">Términos y ayuda->TerminosAyuda]]
+      </div>
+      
+      <div class="footer-icon-item">
+        [[<img src="imagenes/informacion.png" class="menu-icon">Información->InformacionGral]]
+      </div>
+      
+      <div class="footer-icon-item">
+        [[<img src="imagenes/configuracion.png" class="menu-icon">Configuración->ConfiguracionAjustes]]
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+
+
+
+
+
+:: JuegoMain {"position":"300,500","size":"100,100"}
+{
+(set: $laminas to (a:
+    (dm: "id", 1, "url", "imagenes/ishihara/lamina_1.png", "respuesta", "12"),
+    (dm: "id", 2, "url", "imagenes/ishihara/lamina_2.png", "respuesta", "74"),
+    (dm: "id", 3, "url", "imagenes/ishihara/lamina_3.png", "respuesta", "6"),
+    (dm: "id", 4, "url", "imagenes/ishihara/lamina_4.png", "respuesta", "16"),
+    (dm: "id", 5, "url", "imagenes/ishihara/lamina_5.png", "respuesta", "2"),
+    (dm: "id", 6, "url", "imagenes/ishihara/lamina_6.png", "respuesta", "29"),
+    (dm: "id", 7, "url", "imagenes/ishihara/lamina_7.png", "respuesta", "7"),
+    (dm: "id", 8, "url", "imagenes/ishihara/lamina_8.png", "respuesta", "45"),
+    (dm: "id", 9, "url", "imagenes/ishihara/lamina_9.png", "respuesta", "5"),
+    (dm: "id", 10, "url", "imagenes/ishihara/lamina_10.png", "respuesta", "97"),
+    (dm: "id", 11, "url", "imagenes/ishihara/lamina_11.png", "respuesta", "8"),
+    (dm: "id", 12, "url", "imagenes/ishihara/lamina_12.png", "respuesta", "42"),
+    (dm: "id", 13, "url", "imagenes/ishihara/lamina_13.png", "respuesta", "3"),
+    (dm: "id", 14, "url", "imagenes/ishihara/lamina_14.png", "respuesta", "57")
+))
+(set: $laminas_totales to 14)
+
+(if: $juego_iniciado is not true)[
+    (set: $lamina_actual to 1)
+    (set: $aciertos_ishihara to 0)
+    (set: $errores_ishihara to 0)
+    (set: $respuesta_usuario to "")
+    
+    (set: $robot_estado to "normal")
+    (set: $dialogo_completo to false)
+    (set: $juego_iniciado to true)
+]
+
+(set: $robot_image_url to "imagenes/robot/lvl1/robot_" + $robot_estado + ".png")
+(set: $imagen_url to $laminas's ($lamina_actual)'s url)
+(if: $lamina_actual is 1)[
+  <div class="fade-in-overlay"></div>
+]
+}
+
+<script>
+    // 1. Apagamos la música del menú (si es que existe y está sonando)
+    if (window.musicaMenu) {
+        window.musicaMenu.pause();
+    }
+</script>
+
+<audio id="musicaNivel1" src="sonido/lvl1.wav" autoplay loop></audio>
+
+<script>
+    // Guardamos esta nueva música en la memoria global
+    window.musicaNivel1 = document.getElementById('musicaNivel1');
+    
+    // HCI Tip: Volumen bajo (0.5) para que el "Blip" del robot y los efectos se escuchen claro
+    if(window.musicaNivel1) window.musicaNivel1.volume = 0.3;
+</script>
+
+
+
+<div class="game-layout-wrapper">
+  
+  <div class="game-control-panel">
+    
+    <div class="panel-header">
+        <h2 class="panel-title">ISHIHARA COLOR VISION TEST (Level 1)</h2>
+        <div class="panel-counters">
+            <span class="counter-text">Numero: $lamina_actual of $laminas_totales</span>
+            <span class="counter-text">| ACIERTOS: $aciertos_ishihara / ERRORES: $errores_ishihara</span>
+        </div>
+    </div>
+
+    <div class="panel-screen">
+      (print: '<img src="' + $imagen_url + '" class="ishihara-plate" alt="Lámina de Ishihara">')
+    </div>
+
+    <div class="panel-console">
+        <div class="console-item">
+            (input: bind $respuesta_usuario)
+        </div>
+        <div class="console-item">
+            <div class="submit-button-section">
+                [[Verificar->VerificarRespuesta]]
+            </div>
+        </div>
+        <div class="console-item">
+            <div class="exit-button-section">
+                [[Salir->INICIO]]
+            </div>
+        </div>
+    </div>
+
+  </div> 
+  
+  <div class="robot-companion-section">
+      
+      (if: $lamina_actual is 1)[
+        <div id="robot-bubble" class="robot-speech-bubble">
+            <div id="robot-text" class="robot-speech-text"></div>
+        </div>
+      ]
+
+      (print: '<img src="' + $robot_image_url + '" class="robot-state-image" alt="Oftalmo-Bot">')
+  </div>
+
+</div>
+
+<audio id="sonidoBlipRobot" src="sonido/1bit.mp3"></audio>
+
+<script>
+setTimeout(function() {
+    const contenedorTexto = document.getElementById('robot-text');
+    if (!contenedorTexto) return;
+
+    const mensajes = [
+        "El sistema se ha cifrado con una especie de protección contra robots, yo no podré resolver el código de desbloqueo.",
+        "¿Podrías ayudarme a desbloquearlo descifrando los números escondidos en las figuras?"
+    ];
+    
+    const globo = document.getElementById('robot-bubble');
+    const sonidoBlip = document.getElementById('sonidoBlipRobot');
+    
+    if(sonidoBlip) sonidoBlip.volume = 0.9; 
+    
+    let indiceMensaje = 0;
+    let indiceLetra = 0;
+
+    function escribirLetra() {
+        if(!document.getElementById('robot-text')) return; 
+
+        let textoActual = mensajes[indiceMensaje];
+        
+        if (indiceLetra < textoActual.length) {
+            contenedorTexto.innerHTML += textoActual.charAt(indiceLetra);
+            
+            if (textoActual.charAt(indiceLetra) !== ' ' && sonidoBlip) {
+                sonidoBlip.currentTime = 0; 
+                sonidoBlip.play().catch(function(e){}); 
+            }
+            indiceLetra++;
+            setTimeout(escribirLetra, 40); 
+            
+        } else {
+            if (indiceMensaje === 0) {
+                setTimeout(function() {
+                    if(document.getElementById('robot-text')) {
+                        contenedorTexto.innerHTML = ""; 
+                        indiceMensaje++;
+                        indiceLetra = 0;
+                        setTimeout(escribirLetra, 200); 
+                    }
+                }, 7000); 
+            } else {
+                setTimeout(function() {
+                    if(globo) globo.classList.add('hidden'); 
+                }, 2000);
+            }
+        }
+    }
+    escribirLetra();
+}, 200);
+</script>
+
+
+
+
+
+
+:: VerificarRespuesta
+{
+(set: $respuesta_limpia to (trimmed: $respuesta_usuario))
+(set: $respuesta_correcta to $laminas's ($lamina_actual)'s respuesta)
+
+(if: $respuesta_limpia is $respuesta_correcta)[
+    (set: $aciertos_ishihara to it + 1)
+    (set: $robot_estado to "feliz")
+](else:)[
+    (set: $errores_ishihara to it + 1)
+    (set: $robot_estado to "triste")
+]
+
+(set: $respuesta_usuario to "")
+(set: $lamina_actual to it + 1)
+
+(if: $lamina_actual > $laminas_totales)[
+    (go-to: "ResultadosFinales")
+](else:)[
+    (go-to: "JuegoMain")
+]
+}
+
+
+:: JuegoMain_UpdateDialogState
+(set: $dialogo_completo to true)
+(go-to: "JuegoMain")
+
+
+
+
+:: ResultadosFinales
+{
+(set: _mensaje_diagnostico to "")
+(set: _color_diag to "#000")
+
+(if: $aciertos_ishihara >= 12)[
+    (set: _mensaje_diagnostico to "DIAGNÓSTICO PRELIMINAR: Visión de color normal. No se detectan anomalías en la percepción cromática. ¡Excelente trabajo!")
+    (set: _color_diag to "#004085")
+](elseif: $aciertos_ishihara >= 8)[
+    (set: _mensaje_diagnostico to "DIAGNÓSTICO PRELIMINAR: Se detectaron confusiones cromáticas leves. Sugiero ajustar el brillo de la pantalla o realizar una segunda prueba en un entorno bien iluminado.")
+    (set: _color_diag to "#e65100")
+](else:)[
+    (set: _mensaje_diagnostico to "DIAGNÓSTICO PRELIMINAR: Alta tasa de error en patrones cromáticos. Se sugiere la evaluación de un profesional de la salud visual para descartar discromatopsia (daltonismo).")
+    (set: _color_diag to "#b71c1c")
+]
+}
+
+<div class="info-card" style="max-height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+    <h2 class="config-titulo" style="font-size: 3vh; margin-bottom: 2vh;">REPORTE DE DIAGNÓSTICO VISUAL</h2>
+
+    <div class="info-layout" style="display: flex; align-items: center; justify-content: center; gap: 3vw; width: 100%;">
+        
+        <div style="flex: 0 0 25%; text-align: center;">
+            <img src="imagenes/robot/lvl1/robot_normal.png" class="robot-info-image" alt="Oftalmo-Bot Reporte" style="max-height: 40vh; max-width: 100%;">
+        </div>
+
+        <div class="speech-bubble" style="flex: 0 0 65%; padding: 2.5vh; box-sizing: border-box;">
+            
+            <div class="speech-text" style="font-size: 2vh; line-height: 1.3;">
+                <p style="margin: 0 0 1vh 0;"><strong>Módulo 1 Completado:</strong> Visión Cromática (Test de Ishihara).</p>
+                <p style="margin: 0 0 0.5vh 0;">🔹 Aciertos: $aciertos_ishihara de 14</p>
+                <p style="margin: 0 0 1vh 0;">🔸 Errores: $errores_ishihara</p>
+                <hr style="border-color: #00bcd4; margin: 1vh 0;">
+                
+                <p id="texto-diagnostico" style="margin: 0; font-weight: bold; color: (print: _color_diag); min-height: 6vh;"></p>
+                
+                <div id="hidden-diag" style="display: none;">(print: _mensaje_diagnostico)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="config-footer" style="margin-top: 3vh; display: flex; gap: 20px; justify-content: center;">
+        [[INICIAR NIVEL 2->IntroNivelDos]] 
+        [[VOLVER AL MENÚ PRINCIPAL->INICIO]]
+    </div>
+</div>
+
+<audio id="sonidoBlipResultados" src="sonido/1bit.mp3"></audio>
+
+<script>
+    // Cambio de música
+    if (window.musicaNivel1) {
+        window.musicaNivel1.pause();
+        window.musicaNivel1.currentTime = 0; 
+    }
+    if (window.musicaMenu) {
+        window.musicaMenu.play().catch(function(e){});
+    }
+
+    // --- MOTOR DE TEXTO TIPO MÁQUINA DE ESCRIBIR ---
+    setTimeout(function() {
+        const contenedorVisible = document.getElementById('texto-diagnostico');
+        const contenedorOculto = document.getElementById('hidden-diag');
+        const sonidoBlip = document.getElementById('sonidoBlipResultados');
+        
+        if (!contenedorVisible || !contenedorOculto) return;
+        if(sonidoBlip) sonidoBlip.volume = 0.9;
+
+        // Leemos el texto que Twine escondió
+        const mensaje = contenedorOculto.innerText.trim();
+        let indiceLetra = 0;
+
+        function escribirLetra() {
+            // Detenemos el script si el usuario cambia de pasaje rápido
+            if(!document.getElementById('texto-diagnostico')) return; 
+
+            if (indiceLetra < mensaje.length) {
+                contenedorVisible.innerHTML += mensaje.charAt(indiceLetra);
+                
+                if (mensaje.charAt(indiceLetra) !== ' ' && sonidoBlip) {
+                    sonidoBlip.currentTime = 0; 
+                    sonidoBlip.play().catch(function(e){}); 
+                }
+                
+                indiceLetra++;
+                setTimeout(escribirLetra, 40); // Velocidad, ajústala si la quieres más rápida
+            }
+        }
+        
+        escribirLetra();
+    }, 200);
+</script>
+
+
+
+
+
+
+
+
+
+:: IntroNivelDos
+{
+(set: _texto_instrucciones to "<strong>Test de la 'E' Direccional (Cartilla de Snellen)</strong><br><br>Para que esta prueba tenga validez, por favor sigue estas instrucciones al pie de la letra:<br><br><span style='color: #004085;'>• Siéntate a exactamente <strong>1 metro</strong> de distancia de la pantalla.<br>• No hagas zoom en tu navegador.<br>• Indica hacia qué dirección apuntan las 'patas' de la letra E.</span><br><br><span style='color: #b71c1c; font-weight: bold;'>Atención: La letra se hará más pequeña en cada ronda. Solo tienes un intento por tamaño.</span>")
+}
+
+<div class="info-card" style="max-height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2vh;">
+    <h2 class="config-titulo" style="font-size: 3vh; margin-bottom: 2vh; margin-top: 0;">MÓDULO 2: AGUDEZA VISUAL</h2>
+
+    <div class="info-layout" style="display: flex; align-items: center; justify-content: center; gap: 2vw; width: 100%; max-height: 60vh;">
+        
+        <div style="flex: 0 0 25%; text-align: center;">
+            <img src="imagenes/robot/lvl1/robot_normal.png" class="robot-info-image" alt="Oftalmo-Bot" style="max-height: 35vh; max-width: 100%;">
+        </div>
+
+        <div class="speech-bubble" style="flex: 0 0 65%; padding: 2vh 3vh; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center;">
+            
+            <div class="speech-text" style="font-size: 1.9vh; line-height: 1.3; text-align: left;">
+                
+                <div id="texto-intro" style="min-height: 25vh;"></div>
+                
+                <div id="hidden-intro" style="display: none;">(print: _texto_instrucciones)</div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="config-footer" style="margin-top: 3vh; display: flex; justify-content: center;">
+        <div class="boton-arcade">
+        [[COMENZAR PRUEBA->JuegoNivelDos]]
+    </div>
+</div>
+
+<audio id="sonidoBlipIntro" src="sonido/1bit.mp3"></audio>
+
+<script>
+setTimeout(function() {
+    const contenedorVisible = document.getElementById('texto-intro');
+    const contenedorOculto = document.getElementById('hidden-intro');
+    const sonidoBlip = document.getElementById('sonidoBlipIntro');
+    
+    if (!contenedorVisible || !contenedorOculto) return;
+    if(sonidoBlip) sonidoBlip.volume = 0.90;
+
+    let htmlContent = contenedorOculto.innerHTML.trim();
+    let index = 0;
+    let isHTML = false;
+
+    function escribirLetra() {
+        if(!document.getElementById('texto-intro')) return;
+        
+        if (index < htmlContent.length) {
+            let char = htmlContent.charAt(index);
+            
+            if (char === '<') isHTML = true;
+            
+            contenedorVisible.innerHTML = htmlContent.substring(0, index + 1);
+            
+            if (!isHTML && char !== ' ' && char !== '\n' && sonidoBlip) {
+                sonidoBlip.currentTime = 0;
+                sonidoBlip.play().catch(function(e){});
+            }
+            
+            if (char === '>') isHTML = false;
+            
+            index++;
+            setTimeout(escribirLetra, isHTML ? 0 : 20); 
+        }
+    }
+    
+    escribirLetra();
+}, 200);
+</script>
+
+
+
+:: JuegoNivelDos
+{
+(if: $juego_e_iniciado is not true)[
+    (set: $ronda_e to 1)
+    (set: $aciertos_snellen to 0)
+    (set: $errores_snellen to 0)
+    (set: $tamano_actual to 30) 
+    (set: $rotacion_actual to 0) 
+    (set: $robot_estado to "normal")
+    (set: $juego_e_iniciado to true)
+]
+(set: $robot_image_url to "imagenes/robot/lvl1/robot_" + $robot_estado + ".png")
+}
+
+(if: $ronda_e is 1)[
+  <div class="fade-in-overlay"></div>
+]
+
+<div class="game-layout-wrapper">
+  
+  <div class="game-control-panel" style="margin-top: -10vh;">
+    
+    <div class="panel-header">
+        <h2 class="panel-title">SNELLEN ACUITY TEST (Level 2)</h2>
+        <div class="panel-counters">
+            <span class="counter-text">ROUND: $ronda_e of 10</span>
+            <span class="counter-text">| SUCCESSES: $aciertos_snellen / ERRORS: $errores_snellen</span>
+        </div>
+    </div>
+
+    <div class="panel-screen" style="display: flex; justify-content: center; align-items: center; overflow: hidden; height: 35vh; margin-bottom: 2vh;">
+        (print: '<img src="imagenes/lvl2/E.png" class="letra-snellen" style="height: ' + (text: $tamano_actual) + 'vh; transform: rotate(' + (text: $rotacion_actual) + 'deg);" alt="Letra E">')
+    </div>
+
+    <div class="panel-console">
+        <div class="dpad-container">
+            <div style="grid-column: 2; grid-row: 1;">(link: '<img src="imagenes/lvl2/arriba.png" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0px 5px 5px rgba(0,0,0,0.5));">')[(set: $eleccion_usuario to "arriba")(go-to: "EvaluarE")]</div>
+            
+            <div style="grid-column: 1; grid-row: 2;">(link: '<img src="imagenes/lvl2/izquierda.png" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0px 5px 5px rgba(0,0,0,0.5));">')[(set: $eleccion_usuario to "izquierda")(go-to: "EvaluarE")]</div>
+            
+            <div style="grid-column: 3; grid-row: 2;">(link: '<img src="imagenes/lvl2/derecha.png" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0px 5px 5px rgba(0,0,0,0.5));">')[(set: $eleccion_usuario to "derecha")(go-to: "EvaluarE")]</div>
+            
+            <div style="grid-column: 2; grid-row: 3;">(link: '<img src="imagenes/lvl2/abajo.png" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0px 5px 5px rgba(0,0,0,0.5));">')[(set: $eleccion_usuario to "abajo")(go-to: "EvaluarE")]</div>
+        </div>
+        
+        <div class="console-item" style="margin-top: 2vh;">
+            <div class="exit-button-section">
+                [[EXIT->INICIO]]
+            </div>
+        </div>
+    </div>
+
+  </div> 
+  
+  <div class="robot-companion-section">
+      (if: $ronda_e is 1)[
+        <div id="robot-bubble" class="robot-speech-bubble">
+            <div id="robot-text-n2" class="robot-speech-text" style="min-height: 8vh;"></div>
+            <div id="hidden-n2-text" style="display: none;">Indica hacia dónde apuntan las líneas de la figura usando las flechas direccionales.</div>
+        </div>
+        
+        <audio id="sonidoBlipN2" src="sonido/1bit.mp3"></audio>
+
+        <script>
+setTimeout(function() {
+    const contenedorVisible = document.getElementById('robot-text-n2');
+    const contenedorOculto = document.getElementById('hidden-n2-text');
+    const sonidoBlip = document.getElementById('sonidoBlipN2');
+    const globoEntero = document.getElementById('robot-bubble'); // Referencia al globo completo
+
+    if (!contenedorVisible || !contenedorOculto) return;
+    if(sonidoBlip) sonidoBlip.volume = 0.3;
+
+    let htmlContent = contenedorOculto.innerHTML.trim();
+    let index = 0;
+
+    function escribirLetra() {
+        if(!document.getElementById('robot-text-n2')) return;
+
+        if (index < htmlContent.length) {
+            let char = htmlContent.charAt(index);
+            contenedorVisible.innerHTML += char;
+
+            if (char !== ' ' && sonidoBlip) {
+                sonidoBlip.currentTime = 0;
+                sonidoBlip.play().catch(function(e){});
+            }
+
+            index++;
+            setTimeout(escribirLetra, 40);
+        } else {
+            // ¡TERMINÓ DE ESCRIBIR! 
+            // Iniciamos la cuenta regresiva de 5 segundos (5000 milisegundos)
+            setTimeout(function() {
+                if(globoEntero) {
+                    // Le agregamos una transición suave por CSS o lo ocultamos directo
+                    globoEntero.style.transition = "opacity 0.5s ease";
+                    globoEntero.style.opacity = "0";
+                    setTimeout(() => globoEntero.style.display = "none", 500); // Lo quitamos del flujo
+                }
+            }, 5000);
+        }
+    }
+    escribirLetra();
+}, 300);
+</script>
+      ]
+      (print: '<img src="' + $robot_image_url + '" class="robot-state-image" alt="Oftalmo-Bot">')
+  </div>
+
+</div>
+
+
+:: EvaluarE
+{
+(set: _respuesta_correcta to "")
+(if: $rotacion_actual is 0)[
+    (set: _respuesta_correcta to "derecha")
+](elseif: $rotacion_actual is 90)[
+    (set: _respuesta_correcta to "abajo")
+](elseif: $rotacion_actual is 180)[
+    (set: _respuesta_correcta to "izquierda")
+](elseif: $rotacion_actual is 270)[
+    (set: _respuesta_correcta to "arriba")
+]
+
+(if: $eleccion_usuario is _respuesta_correcta)[
+    (set: $aciertos_snellen to it + 1)
+    (set: $robot_estado to "feliz")
+](else:)[
+    (set: $errores_snellen to it + 1)
+    (set: $robot_estado to "triste")
+]
+
+(set: $ronda_e to it + 1)
+
+(set: _tamanos to (a: 30, 24, 18, 14, 10, 7, 5, 3.5, 2.5, 1.5))
+
+(if: $ronda_e <= 10)[
+    (set: $tamano_actual to _tamanos's ($ronda_e))
+]
+
+(set: $rotacion_actual to (either: 0, 90, 180, 270))
+
+(if: $ronda_e > 10)[
+    (go-to: "ResultadosNivelDos")
+](else:)[
+    (go-to: "JuegoNivelDos")
+]
+}
+
+
+
+:: ResultadosNivelDos
+{
+(set: _mensaje_diagnostico to "")
+(set: _color_diag to "#000")
+
+(if: $aciertos_snellen >= 9)[
+    (set: _mensaje_diagnostico to "DIAGNÓSTICO PRELIMINAR: Agudeza visual óptima. Tienes una vista excelente; no se detectan problemas para enfocar a la distancia.")
+    (set: _color_diag to "#004085")
+](elseif: $aciertos_snellen >= 6)[
+    (set: _mensaje_diagnostico to "DIAGNÓSTICO PRELIMINAR: Agudeza visual aceptable, pero presentas dificultad con los tamaños más pequeños. Podría ser un indicio de fatiga visual o miopía leve.")
+    (set: _color_diag to "#e65100")
+](else:)[
+    (set: _mensaje_diagnostico to "DIAGNÓSTICO PRELIMINAR: Dificultad severa para enfocar. Es altamente recomendable que visites a un especialista para una evaluación visual completa.")
+    (set: _color_diag to "#b71c1c")
+]
+}
+
+<div class="info-card" style="max-height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2vh;">
+    <h2 class="config-titulo" style="font-size: 3vh; margin-bottom: 2vh; margin-top: 0;">REPORTE DE DIAGNÓSTICO VISUAL</h2>
+
+    <div class="info-layout" style="display: flex; align-items: center; justify-content: center; gap: 3vw; width: 100%;">
+        
+        <div style="flex: 0 0 25%; text-align: center;">
+            <img src="imagenes/robot/lvl1/robot_normal.png" class="robot-info-image" alt="Oftalmo-Bot Reporte" style="max-height: 35vh; max-width: 100%;">
+        </div>
+
+        <div class="speech-bubble" style="flex: 0 0 65%; padding: 2vh 3vh; box-sizing: border-box;">
+            
+            <div class="speech-text" style="font-size: 2vh; line-height: 1.3;">
+                <p style="margin: 0 0 1vh 0;"><strong>Módulo 2 Completado:</strong> Agudeza Visual (Test de Snellen).</p>
+                
+                <p style="margin: 0 0 0.5vh 0;">🔹 Aciertos: $aciertos_snellen de 10</p>
+                <p style="margin: 0 0 1vh 0;">🔸 Errores: $errores_snellen</p>
+                
+                <hr style="border-color: #00bcd4; margin: 1vh 0;">
+                
+                <p id="texto-diagnostico-n2" style="margin: 0; font-weight: bold; color: (print: _color_diag); min-height: 8vh;"></p>
+                
+                <div id="hidden-diag-n2" style="display: none;">(print: _mensaje_diagnostico)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="config-footer" style="margin-top: 3vh; display: flex; gap: 20px; justify-content: center;">
+        <div class="boton-arcade">
+            [[VOLVER AL MENÚ PRINCIPAL->INICIO]]
+        </div>
+    </div>
+</div>
+
+<audio id="sonidoBlipResN2" src="sonido/1bit.mp3"></audio>
+
+<script>
+    // Motor de escritura con el blip
+    setTimeout(function() {
+        const contenedorVisible = document.getElementById('texto-diagnostico-n2');
+        const contenedorOculto = document.getElementById('hidden-diag-n2');
+        const sonidoBlip = document.getElementById('sonidoBlipResN2');
+        
+        if (!contenedorVisible || !contenedorOculto) return;
+        if(sonidoBlip) sonidoBlip.volume = 0.3;
+
+        const mensaje = contenedorOculto.innerText.trim();
+        let indiceLetra = 0;
+
+        function escribirLetra() {
+            if(!document.getElementById('texto-diagnostico-n2')) return; 
+
+            if (indiceLetra < mensaje.length) {
+                contenedorVisible.innerHTML += mensaje.charAt(indiceLetra);
+                
+                if (mensaje.charAt(indiceLetra) !== ' ' && sonidoBlip) {
+                    sonidoBlip.currentTime = 0; 
+                    sonidoBlip.play().catch(function(e){}); 
+                }
+                
+                indiceLetra++;
+                setTimeout(escribirLetra, 40); 
+            }
+        }
+        
+        escribirLetra();
+    }, 200);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:: TerminosAyuda {"position":"700,500","size":"100,100"}
+<audio id="sonidoBlipTerminos" src="sonido/1bit.mp3"></audio>
+
+<div class="info-card">
+    <h2 class="config-titulo">TÉRMINOS Y AYUDA</h2>
+
+    <div class="info-layout">
+         <img src="imagenes/robot/informacion/informacion.gif" class="robot-info-image" alt="Oftalmo-Bot Presentando">
+
+        <div class="speech-bubble">
+            <div id="texto-maquina-terminos" class="speech-text"></div>
+        </div>
+    </div>
+
+    <div class="config-footer">
+        [[VOLVER AL MENÚ->INICIO]]
+    </div>
+</div>
+
+<script>
+// Motor de máquina de escribir (Versión Multimensaje)
+setTimeout(function() {
+    // Aquí definimos los dos mensajes en orden
+    const mensajes = [
+        "Es importante comunicar que el sistema no sustituye un diagnóstico médico profesional, sino que funciona como una herramienta de orientación inicial.",
+        "Se recomienda al usuario que ajuste su brillo en 'Configuración' para un mejor diagnóstico."
+    ];
+    
+    const contenedorTexto = document.getElementById('texto-maquina-terminos');
+    const sonidoBlip = document.getElementById('sonidoBlipTerminos');
+    
+    // Volumen suave para el 8-bits
+    if(sonidoBlip) sonidoBlip.volume = 0.3; 
+
+    let indiceMensaje = 0; // Controla qué mensaje estamos leyendo (0 o 1)
+    let indiceLetra = 0;   // Controla qué letra estamos imprimiendo
+
+    function escribirLetra() {
+        let textoActual = mensajes[indiceMensaje];
+        
+        if (indiceLetra < textoActual.length) {
+            // Escribimos la letra
+            contenedorTexto.innerHTML += textoActual.charAt(indiceLetra);
+            
+            // Sonido (si no es un espacio)
+            if (textoActual.charAt(indiceLetra) !== ' ' && sonidoBlip) {
+                sonidoBlip.currentTime = 0; 
+                sonidoBlip.play().catch(function(e){}); 
+            }
+            
+            indiceLetra++;
+            setTimeout(escribirLetra, 40); // Velocidad: 40ms por letra
+            
+        } else {
+            // Cuando termina de escribir un mensaje entero...
+            if (indiceMensaje === 0) {
+                // Si era el PRIMER mensaje, iniciamos el temporizador de 5 segundos (5000 ms)
+                setTimeout(function() {
+                    contenedorTexto.innerHTML = ""; // Borramos el texto de golpe
+                    indiceMensaje++; // Pasamos al segundo mensaje
+                    indiceLetra = 0; // Reiniciamos el contador de letras
+                    
+                    // Esperamos medio segundo antes de empezar a escribir el nuevo mensaje
+                    setTimeout(escribirLetra, 500); 
+                }, 5000);
+            }
+            // Si es el segundo mensaje, ya no hace nada, se queda ahí fijo.
+        }
+    }
+
+    // Arrancamos el motor
+    escribirLetra();
+}, 100);
+</script>
+
+
+
+
+:: InformacionGral {"position":"850,500","size":"100,100"}
+<audio id="sonidoBlip" src="sonido/1bit.mp3"></audio>
+
+<div class="info-card">
+    <h2 class="config-titulo">ACERCA DE EYELY</h2>
+
+    <div class="info-layout">
+        <img src="imagenes/robot/informacion/informacion.gif" class="robot-info-image" alt="Oftalmo-Bot Presentando">
+
+        <div class="speech-bubble">
+            <div id="texto-maquina" class="speech-text"></div>
+        </div>
+    </div>
+
+    <div class="config-footer">
+        [[VOLVER AL MENÚ->INICIO]]
+    </div>
+</div>
+
+<script>
+// Motor de máquina de escribir
+setTimeout(function() {
+    const textoAImprimir = "¡Hola! Bienvenido a Eyely. Este sistema interactivo está diseñado como una herramienta para realizar pruebas rápidas y ayudarte a diagnosticar posibles problemas visuales. ¡Recuerda que la salud de tus ojos es muy importante!";
+    
+    const contenedorTexto = document.getElementById('texto-maquina');
+    const sonidoBlip = document.getElementById('sonidoBlip');
+    let indice = 0;
+
+    // Bajamos un poco el volumen del blip para que no lastime los oídos
+    if(sonidoBlip) sonidoBlip.volume = 0.9; 
+
+    function escribirLetra() {
+        if (indice < textoAImprimir.length) {
+            // Agregamos la letra actual
+            contenedorTexto.innerHTML += textoAImprimir.charAt(indice);
+            
+            // Reproducimos el sonido SOLO si no es un espacio en blanco
+            if (textoAImprimir.charAt(indice) !== ' ' && sonidoBlip) {
+                sonidoBlip.currentTime = 0; // Regresa el audio al inicio al instante
+                sonidoBlip.play().catch(function(e){}); // Dispara el sonido
+            }
+            
+            indice++;
+            // Velocidad de escritura: 40 milisegundos entre cada letra
+            setTimeout(escribirLetra, 40); 
+        }
+    }
+
+    // Iniciamos la animación
+    escribirLetra();
+}, 100); // Pequeño retraso para que cargue la pantalla primero
+</script>
+
+
+
+:: ConfiguracionAjustes {"position":"1000,500","size":"100,100"}
+<div class="config-card">
+    <h2 class="config-titulo">CALIBRACIÓN VISUAL</h2>
+    <p class="config-texto">Para un diagnóstico preciso, ajusta los controles hasta que el símbolo dentro de la caja oscura sea <b>apenas visible</b>.</p>
+
+    <div class="calibracion-wrapper">
+        <img src="imagenes/robot/configuracion/robotapuntando.gif" class="robot-pizarra" alt="Rob profesor">
+
+        <div class="calibracion-caja">
+            <img src="imagenes/ojo.png" class="calibracion-simbolo" alt="Símbolo de prueba">
+        </div>
+
+        <div class="controles-caja">
+            <label>Brillo</label>
+            <input type="range" id="barraBrillo" class="slider-estilo" min="0.5" max="1.5" step="0.05" value="1">
+            
+            <label>Contraste</label>
+            <input type="range" id="barraContraste" class="slider-estilo" min="0.5" max="1.5" step="0.05" value="1">
+        </div>
+    </div>
+
+    <div class="config-footer">
+        [[GUARDAR Y VOLVER AL MENÚ->INICIO]]
+    </div>
+</div>
+
+
+
+<script>
+setTimeout(function() {
+    const sBrillo = document.getElementById('barraBrillo');
+    const sContraste = document.getElementById('barraContraste');
+
+    if(window.nivelBrillo) sBrillo.value = window.nivelBrillo;
+    if(window.nivelContraste) sContraste.value = window.nivelContraste;
+
+    function aplicarFiltros() {
+        window.nivelBrillo = sBrillo.value;
+        window.nivelContraste = sContraste.value;
+        document.body.style.filter = `brightness(${sBrillo.value}) contrast(${sContraste.value})`;
+    }
+
+    sBrillo.addEventListener('input', aplicarFiltros);
+    sContraste.addEventListener('input', aplicarFiltros);
+}, 100); 
+</script>
+:: StoryScript [script]
+
+
+
+// --- GESTOR DE AUDIO GLOBAL ---
+(function() {
+    // 1. Cargamos tu canción en la memoria (asegúrate de que la ruta sea correcta)
+    window.musicaMenu = new Audio("sonido/fondo.mp3"); 
+    window.musicaMenu.loop = false;
+
+    // 2. Le decimos al navegador: "En cuanto el usuario haga su PRIMER CLIC en la pantalla, enciende el audio"
+    // Este clic será cuando presionen "INICIAR SISTEMA" en la Pantalla Cero.
+    document.body.addEventListener('click', function() {
+        window.musicaMenu.play().catch(function(e) {
+            console.log("Audio esperando interacción...");
+        });
+    }, { once: true }); // El "once: true" hace que este evento solo funcione una vez
+
+    // 3. Creamos un interruptor para apagarla cuando entremos al juego
+    window.detenerMusica = function() {
+        if (window.musicaMenu) {
+            window.musicaMenu.pause();
+            window.musicaMenu.currentTime = 0; // Regresa la canción al principio
+        }
+    };
+})();
+
+
+// --- MOTOR DE PARTÍCULAS DINÁMICAS ---
+(function() {
+    // 1. Aquí pones las rutas EXACTAS de tus 5 imágenes preparadas
+    const imagenesParticulas = [
+        "imagenes/cruz.png",
+        "imagenes/control.png",
+        "imagenes/ojo.png",
+        "imagenes/ojo2.png",
+        "imagenes/lentes.png",
+        "imagenes/robot.png" 
+    ];
+
+    function crearContenedor() {
+        if (!document.getElementById('particle-container')) {
+            const container = document.createElement('div');
+            container.id = 'particle-container';
+            // Lo anclamos al fondo de toda la página para que no se borre al cambiar de menú
+            document.body.appendChild(container); 
+        }
+    }
+
+    function spawnParticula() {
+        const container = document.getElementById('particle-container');
+        if (!container) return;
+
+        const img = document.createElement('img');
+        
+        // Elige una de tus 5 imágenes al azar
+        img.src = imagenesParticulas[Math.floor(Math.random() * imagenesParticulas.length)];
+        img.className = 'particula-flotante';
+
+        // Tamaño aleatorio (entre 30px y 70px)
+        const size = Math.random() * 40 + 30; 
+        img.style.width = size + 'px';
+        
+        // Rotación aleatoria para que giren mientras suben
+        const rotacionInicial = Math.random() * 360;
+        const rotacionFinal = rotacionInicial + (Math.random() * 360 - 180); 
+
+        // Puntos de inicio y fin (Salen de abajo y suben a lo alto de la pantalla)
+        const startX = Math.random() * window.innerWidth; // Posición horizontal aleatoria
+        const startY = window.innerHeight + 100; // Empiezan escondidas abajo
+        
+        const endX = startX + (Math.random() * 300 - 150); // Se desvían un poco a la izq o der
+        const endY = -150; // Terminan escondidas arriba
+
+        // Velocidad de la animación (entre 10 y 20 segundos para que sea súper relajante)
+        const duration = Math.random() * 10000 + 10000; 
+
+        // Posición inicial
+        img.style.left = startX + 'px';
+        img.style.top = startY + 'px';
+        img.style.transform = `rotate(${rotacionInicial}deg)`;
+        img.style.transition = `top ${duration}ms linear, left ${duration}ms linear, transform ${duration}ms linear`;
+
+        container.appendChild(img);
+
+        // Forzamos al navegador a leer la posición inicial antes de moverlas
+        void img.offsetWidth;
+
+        // Arrancamos el movimiento hacia arriba
+        img.style.top = endY + 'px';
+        img.style.left = endX + 'px';
+        img.style.transform = `rotate(${rotacionFinal}deg)`;
+
+        // Autodestrucción de la imagen cuando sale de la pantalla (evita que tu laptop se trabe)
+        setTimeout(function() {
+            if (img.parentNode) {
+                img.parentNode.removeChild(img);
+            }
+        }, duration);
+    }
+
+    // Inicializamos el sistema
+    if (document.readyState === 'complete') {
+        crearContenedor();
+        setInterval(spawnParticula, 2500); // Crea una nueva partícula cada 2.5 segundos
+    } else {
+        window.addEventListener('load', function() {
+            crearContenedor();
+            setInterval(spawnParticula, 2500);
+        });
+    }
+})();
+
+:: StoryStylesheet [stylesheet]
+
+
+/*******************************************************
+   SISTEMA DE PARTÍCULAS (Fondo Dinámico)
+********************************************************/
+#particle-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1; /* Esto lo pone POR ENCIMA de tu fondo 1.png... */
+    pointer-events: none; /* Evita que las imágenes bloqueen tus clics */
+    overflow: hidden; 
+}
+
+.main-menu-card, .pantalla-cero {
+    position: relative;
+    z-index: 10; /* ...y esto asegura que tu tarjeta esté POR ENCIMA de las partículas */
+}
+
+.particula-flotante {
+    position: absolute;
+    opacity: 0.3; /* Semitransparentes para que no distraigan. Puedes subirlo a 0.5 si quieres */
+    filter: drop-shadow(0px 0px 5px rgba(0, 188, 212, 0.3)); /* Un brillo sutil turquesa */
+}
+
+
+
+
+/*******************************************************
+   ESTILOS GENERALES Y FONDO
+********************************************************/
+tw-story {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url("imagenes/1.png"); 
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #f0f4f8; 
+    color: #333333;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+tw-sidebar { display: none; }
+tw-link { color: inherit; text-decoration: none; }
+
+/*******************************************************
+   LA TARJETA (Ahora aún más transparente)
+********************************************************/
+.main-menu-card {
+    background-color: rgba(255, 255, 255, 0.20); /* <-- Súper transparente al 0.20 */
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+    border-radius: 30px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    
+    width: 85vw; 
+    max-width: 1100px; 
+    height: 85vh; 
+    
+    padding: 30px 40px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    align-items: center; 
+    box-sizing: border-box;
+}
+
+/*******************************************************
+   ZONA SUPERIOR: LOGO
+********************************************************/
+.menu-header {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 80px; /* <-- Esto empuja el botón JUGAR hacia abajo, separándolo del logo */
+}
+
+/*******************************************************
+   ESTILOS DEL LOGO (Más grande)
+********************************************************/
+.main-logo {
+    max-width: 500px; 
+    height: auto;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
+    
+    /* Le decimos que use la animación "respirar", que dure 4 segundos, 
+       que sea suave (ease-in-out) y que se repita al infinito */
+    animation: respirar 4s ease-in-out infinite;
+}
+
+/* Aquí creamos los "fotogramas" de la animación */
+@keyframes respirar {
+    0% { transform: scale(1); }       /* Tamaño normal al inicio */
+    50% { transform: scale(0.96); }   /* Se encoge un 4% a la mitad del tiempo */
+    100% { transform: scale(1); }     /* Vuelve a la normalidad al final */
+}
+
+/*******************************************************
+   ZONA CENTRAL: JUGAR PERFECTAMENTE CENTRADO
+********************************************************/
+.menu-middle {
+    position: relative; /* Clave para aislar al robot */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    flex-grow: 1; /* Esto hace que ocupe todo el espacio central libre */
+}
+
+/*******************************************************
+   ROBOT ANIMADO
+********************************************************/
+.robot-section {
+    position: absolute;
+    left: -20px; /* <--- Ajusta este número para moverlo a la izquierda/derecha */
+    top: 50%; 
+    transform: translateY(-50%); 
+    z-index: 3; 
+    pointer-events: none; 
+}
+
+.robot-animado {
+    width: 220px; /* <--- Ajusta qué tan grande quieres tu GIF aquí */
+    height: auto;
+    filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.2)); 
+}
+
+/* Un pequeño efecto opcional: si pasas el mouse sobre él, reacciona flotando un poquito */
+.robot-animado:hover {
+    transform: translateY(-10px);
+}
+
+/* El botón ahora domina el centro */
+.jugar-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 2;
+}
+
+/* El botón domina el centro y se alinea con los iconos */
+.jugar-section {
+    width: 85%; /* Mismo ancho que tienen los iconos de abajo */
+    max-width: 750px;
+    display: flex;
+    justify-content: center;
+    z-index: 2;
+}
+
+/* Forzamos a Twine a respetar el tamaño */
+.jugar-section tw-expression, 
+.jugar-section tw-hook {
+    width: 100%;
+}
+
+/*******************************************************
+   ESTILOS DEL BOTÓN JUGAR (Alto y rectangular)
+********************************************************/
+.jugar-section tw-link {
+    background-color: #33abac; 
+    color: #ffffff;
+    font-size: 80px; 
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 100%; 
+    text-align: center;
+    padding: 40px 0; /* <-- Mucho más alto verticalmente */
+    border-radius: 20px; /* <-- Bordes suavizados (menos redondeado, forma rectangular) */
+    
+    
+
+    box-shadow: 0 0 30px rgba(0, 188, 212, 0.8), 0 6px 12px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    display: block !important; 
+    box-sizing: border-box;
+}
+
+/* Opcional: Hacemos que el brillo sea más intenso al pasar el mouse */
+.jugar-section tw-link:hover {
+    background-color: #00acc1; 
+    box-shadow: 0 0 45px rgba(0, 188, 212, 1), 0 6px 12px rgba(0,0,0,0.3);
+}
+.jugar-section tw-link:active {
+    transform: scale(0.98); 
+}
+
+/*******************************************************
+   ZONA INFERIOR: ICONOS GIGANTES
+********************************************************/
+.menu-footer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 20px;
+}
+
+.footer-icons-wrapper {
+    display: flex;
+    justify-content: space-between; /* Distribuye el espacio entre los 3 íconos */
+    width: 85%; /* Mismo ancho idéntico que el botón JUGAR */
+    max-width: 750px;
+}
+
+.footer-icon-item tw-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: #004085;
+    font-size: 24px; /* <--- Texto mucho más grande (antes era 16px) */
+    font-weight: bold;
+}
+
+.menu-icon {
+    width: 190px; /* Tamaño gigantesco como pediste (casi 200px) */
+    height: auto;
+    max-height: 190px;
+    object-fit: contain;
+    margin-bottom: -10px;
+    transition: transform 0.2s;
+}
+
+.menu-icon:hover {
+    transform: scale(1.05);
+}
+
+.footer-icon-item img {
+    border: none;
+}
+
+/*******************************************************
+   PANTALLA CERO (Botón inicial)
+********************************************************/
+.pantalla-cero tw-link {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 20px 50px;
+    border-radius: 15px;
+    color: #004085;
+    font-size: 28px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: 2px solid #00bcd4;
+    box-shadow: 0 0 20px rgba(0, 188, 212, 0.4);
+    transition: all 0.3s ease;
+    display: inline-block;
+    
+    /* ¡Aprovechamos la misma animación de respiración que le dimos al logo! */
+    animation: respirar 3s ease-in-out infinite; 
+}
+
+.pantalla-cero tw-link:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(0, 188, 212, 0.8);
+}
+
+
+/*******************************************************
+   VENTANA DE CONFIGURACIÓN Y CALIBRACIÓN
+********************************************************/
+.config-card {
+    background-color: rgba(255, 255, 255, 0.20); 
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px); 
+    border-radius: 20px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+    width: 70vw; 
+    max-width: 800px; 
+    padding: 40px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+}
+
+.config-titulo {
+    color: #004085;
+    font-size: 36px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.config-texto {
+    color: #004085;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.calibracion-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+/* La magia de la caja oscura */
+.calibracion-caja {
+    width: 180px;
+    height: 180px;
+    background-color: #050505; /* Fondo casi negro */
+    border: 2px solid #333;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 20px rgba(0,0,0,1);
+}
+
+.calibracion-simbolo {
+    width: 80px;
+    height: auto;
+    /* Oscurecemos totalmente la imagen original y la dejamos gris muy oscuro */
+    filter: brightness(0) invert(0.15); 
+}
+
+.controles-caja {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    gap: 15px;
+}
+
+.controles-caja label {
+    color: #004085;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: -5px;
+}
+
+/* Estilo para las barras deslizables */
+.slider-estilo {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: rgba(0, 64, 133, 0.3);
+    border-radius: 5px;
+    outline: none;
+}
+
+.slider-estilo::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #00bcd4;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 188, 212, 0.8);
+}
+
+.config-footer tw-link {
+    background-color: #004085;
+    color: white;
+    padding: 15px 40px;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.config-footer tw-link:hover {
+    background-color: #00bcd4;
+    transform: scale(1.05);
+}
+
+.robot-pizarra {
+    width: 160px; /* Ajusta este valor si sientes que tu robot quedó muy chico o muy grande */
+    height: auto;
+    filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.2)); /* Le da sombra para integrarlo al cristal */
+    transform: translateY(10px); /* Esto lo baja un poquito por si no queda alineado con la caja negra, ajústalo a tu gusto */
+}
+
+
+
+
+
+/*******************************************************
+   VENTANA DE INFORMACIÓN (Estilo RPG)
+********************************************************/
+/* Tarjeta de información: Ahora es un rectángulo ancho */
+.info-card {
+    background-color: rgba(255, 255, 255, 0.20); 
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px); 
+    border-radius: 30px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+    width: 85vw; 
+    max-width: 1100px; 
+    min-height: 70vh; 
+    padding: 40px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: space-between; 
+    box-sizing: border-box;
+}
+
+/* Contenedor: Alineado a la izquierda para acercar al robot */
+.info-layout {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Empujamos todo a la izquierda */
+    width: 100%;
+    flex-grow: 1;
+    padding: 0 40px; /* Margen para que el robot no toque el borde */
+    box-sizing: border-box;
+    position: relative; /* Clave para la superposición */
+}
+
+/* Tu Robot PNG (estático) */
+.robot-info-image {
+    width: 500px; 
+    height: auto;
+    flex-shrink: 0; 
+    filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.2)); 
+    
+    /* Superposición: Posición relativa para usar z-index */
+    position: relative;
+    z-index: 1; /* Abajo del sándwich */
+    
+    /* Alineación vertical (ajusta si el piquito no da en la boca) */
+    transform: translateY(15px); 
+}
+
+
+/* El globo de diálogo (Flotante y superpuesto) */
+.speech-bubble {
+    position: relative;
+    background: rgba(255, 255, 255, 0.9); /* Un poco más opaco para leer mejor sobre el robot */
+    border: 3px solid #00bcd4;
+    border-radius: 15px;
+    padding: 30px; 
+    
+    flex-grow: 1; 
+    width: 100%; 
+    max-width: 700px; /* Reducimos el max-width para que no se vea tan largo horizontalmente */
+    min-height: 150px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+
+    /* Superposición: z-index superior */
+    z-index: 2; /* Arriba del robot */
+    
+    /* EL TRUCO: Margen izquierdo negativo para encimarlo sobre el robot */
+    margin-left: -70px; /* <--- Ajusta este número para acercarlo/alejarlo del robot */
+
+    /* Animación de flotado (la creamos abajo) */
+    animation: flotarBubble 4s ease-in-out infinite; 
+}
+
+/* --- Ajuste fino de los "piquitos" para que nazcan de la boca --- */
+/* El piquito del globo (borde) */
+.speech-bubble::before {
+    content: '';
+    position: absolute;
+    left: -20px; /* Ajustamos para que nazca *detrás* del borde */
+    
+    /* ALINEACIÓN CON LA BOCA: Ajusta este % (entre 30% y 50%) según tu robot */
+    top: 35%; /* Subimos el piquito para que coincida con la boca de la imagen */
+    
+    transform: translateY(-50%);
+    border-width: 10px 20px 10px 0; /* Piquito un poco más largo horizontalmente */
+    border-style: solid;
+    border-color: transparent #00bcd4 transparent transparent;
+}
+
+/* El piquito del globo (relleno blanco) */
+.speech-bubble::after {
+    content: '';
+    position: absolute;
+    left: -15px; /* Ajuste preciso */
+    
+    /* ALINEACIÓN CON LA BOCA: Debe ser el mismo % que el ::before */
+    top: 35%; 
+    
+    transform: translateY(-50%);
+    border-width: 8px 16px 8px 0;
+    border-style: solid;
+    border-color: transparent white transparent transparent;
+}
+
+/* Definición de la animación de flotado */
+@keyframes flotarBubble {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); } /* Sube 10px a la mitad del ciclo */
+    100% { transform: translateY(0px); }
+}
+
+/* El estilo de la letra retro (mantener igual) */
+.speech-text {
+    font-family: 'Courier New', Courier, monospace; 
+    font-size: 20px;
+    color: #004085;
+    font-weight: bold;
+    line-height: 1.5;
+}
+
+
+
+
+
+/*******************************************************
+   NIVEL 1: TEST DE ISHIHARA (Panel Retro)
+********************************************************/
+/* Contenedor principal para centrar la máquina */
+.game-level-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* LA MÁQUINA (Tu imagen de fondo) */
+/* === Definición de la animación de alerta (Pulsación Roja) === */
+@keyframes alertaBloqueo {
+    /* Estado inicial: Sombra oscura base original */
+    0% {
+        box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    }
+    /* A la mitad del ciclo: Resplandor rojo intenso y suave */
+    50% {
+        box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 50px rgba(255, 0, 0, 0.9);
+    }
+    /* Regresamos al estado inicial */
+    100% {
+        box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    }
+}
+
+/* === Tu bloque de panel actualizado === */
+.game-control-panel {
+    position: relative;
+    
+    /* ¡Asegúrate que esta ruta a tu imagen sea correcta! */
+    background-image: url("imagenes/fondos/3.png"); 
+    background-size: cover;
+    background-position: center;
+    border-radius: 30px;
+    
+    /* Quitamos el box-shadow fijo y aplicamos la animación */
+    /* Usamos: alertaBloqueo (nombre), 4s (duración lenta), ease-in-out (suave), infinite (bucle) */
+    animation: alertaBloqueo 4s ease-in-out infinite;
+
+    /* --- LÓGICA DE ADAPTABILIDAD PROPORCIONAL (Se mantiene) --- */
+    height: 85vh; /* Ajuste para dar aire con el robot */
+    aspect-ratio: 1 / 1.05; 
+    max-width: 70vw; /* Ajuste para el robot */
+}
+
+
+
+/* =======================================================
+   ELEMENTOS INTERNOS ADAPTABLES (Escalan con la máquina)
+======================================================== */
+
+/* MARCADORES (Arriba) */
+.panel-header {
+    position: absolute;
+    top: 0%; /* Lo bajamos un poquito para que no toque el borde */
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.panel-title {
+    color: #f8f8f8;
+    font-size: 2.2vh; /* Se adapta a la altura de la pantalla */
+    margin: 0 1 0.8vh 0;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* === REEMPLAZA ESTE BLOQUE (EL CONTENEDOR NEGRO) === */
+.panel-counters {
+    background-color: #050505;
+    border: 2px solid #00bcd4;
+    border-radius: 5px;
+    
+    /* Ajustamos el espacio interno (Padding) */
+    /* El primer número es arriba/abajo, el segundo es izquierda/derecha */
+    padding: 0.0vh 0.8vh; 
+    
+    /* Quitamos cualquier ancho fijo que pudiera tener */
+    width: auto; 
+    display: inline-block; /* Esto hace que la caja solo crezca lo necesario para envolver al texto */
+    
+    /* Sombra interna para el efecto digital */
+    box-shadow: inset 0 0 8px rgba(0, 188, 212, 0.3);
+    
+    /* Alineación */
+    margin-top: 0.5vh;
+}
+
+.counter-text {
+    font-family: 'Courier New', Courier, monospace;
+    color: #00bcd4;
+    font-weight: bold;
+    
+    /* --- EL CAMBIO CLAVE --- */
+    font-size: 1.8vh; /* Hacemos la letra del contador más pequeña y sutil */
+    
+    margin: 0 0.8vh;
+}
+
+/* LA PANTALLA BLANCA (Donde salen las láminas) */
+.panel-screen {
+    position: absolute;
+    top: 25%; /* Ajustado para centrar mejor verticalmente */
+    left: 14%;
+    width: 72%;
+    height: 44%; /* Un poco más bajito para dar aire */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent; 
+}
+
+.ishihara-plate {
+    /* --- EL CAMBIO CLAVE --- */
+    max-width: 70%; /* Reducimos la lámina al 80% del espacio para que respire */
+    max-height: 70%;
+    margin-left: 18%;
+    
+    object-fit: contain;
+    filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.2));
+}
+
+
+/* LA CONSOLA DE BOTONES (Abajo) */
+.panel-console {
+    position: absolute;
+    bottom: 6%; /* Subimos un poco para cuadrar con los dibujos de tu panel */
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    padding: 0 10%;
+    box-sizing: border-box;
+}
+
+.console-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Ocultamos esta etiqueta porque tu imagen ya trae el texto dibujado */
+.input-label {
+    display: none; 
+}
+
+/* CAJA DE TEXTO DONDE ESCRIBE EL USUARIO */
+.console-item input[type="text"] {
+    background-color: #111;
+    color: #00bcd4;
+    border: 3px solid #00bcd4;
+    border-radius: 8px;
+    padding: 0.8vh;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 2.2vh;
+    font-weight: bold;
+    text-align: center;
+    width: 12vh; /* Ancho dinámico */
+    box-shadow: inset 0 0 10px rgba(0, 188, 212, 0.5);
+    outline: none;
+    margin-bottom: 0.5vh;
+}
+
+/* EL BOTÓN DE ENVIAR (SUBMIT) */
+.submit-button-section tw-link {
+    background-color: #39c0bb;
+    color: white;
+    font-size: 2vh;
+    font-weight: bold;
+    padding: 1.2vh 3vh;
+    border-radius: 10px;
+    border: 2px solid #3698a4;
+    box-shadow: 0 0.4vh 0 #3698a4, 0 0.8vh 1.5vh rgba(0,0,0,0.3);
+    text-transform: uppercase;
+    transition: all 0.1s;
+    display: inline-block;
+}
+
+.submit-button-section tw-link:active {
+    transform: translateY(0.4vh);
+    box-shadow: 0 0 0 #00838f, 0 0.2vh 0.5vh rgba(0,0,0,0.3); 
+}
+
+/* EL BOTÓN DE SALIR (EXIT) */
+.exit-button-section tw-link {
+    background-color: #efa045;
+    color: white;
+    font-size: 1.5vh;
+    font-weight: bold;
+    padding: 1vh 2vh;
+    border-radius: 8px;
+    border: 2px solid #6c5442;
+    box-shadow: 0 0.4vh 0 #c87840;
+    text-transform: uppercase;
+}
+
+.exit-button-section tw-link:active {
+    transform: translateY(0.4vh);
+    box-shadow: 0 0 0 #b71c1c;
+}
+
+/*******************************************************
+   ROBOT ACOMPAÑANTE (En el Nivel 1)
+********************************************************/
+/* Contenedor principal que envuelve a la máquina y al robot */
+.game-layout-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px; /* Espacio entre la máquina y el robot */
+    width: 100vw;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Reducimos ligeramente la máquina para que quepa el robot a un lado */
+.game-control-panel {
+    /* Mantenemos lo anterior, solo ajustamos max-width */
+    position: relative;
+    height: 85vh; /* Un poco más bajito */
+    aspect-ratio: 1 / 1.05; 
+    max-width: 70vw; /* Dejamos 30vw para el robot */
+    margin: 0; /* Quitamos margin auto */
+}
+
+/* El contenedor del Robot y su diálogo */
+.robot-companion-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 25vw;
+    max-width: 300px;
+    position: relative; 
+    margin-top: -1vh; /* Subimos un poco para alinear con la pantalla */
+}
+
+/* La Imagen del Robot */
+/* === Definición de la animación de respiración === */
+@keyframes respirarRobot {
+    /* Estado inicial y final: tamaño normal y posicionado */
+    0%, 100% {
+        transform: scale(1) translateY(0px);
+    }
+    /* A la mitad del ciclo: se encoge un 3% y baja 3px (settling breath) */
+    50% {
+        transform: scale(0.97) translateY(3px); 
+    }
+}
+
+/* === La clase de tu robot (Actualizada con animación) === */
+.robot-state-image {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.3));
+    
+    /* Esta transición se queda, es para los cambios de estado (feliz/triste) */
+    transition: all 0.3s ease; 
+    
+    z-index: 1;
+
+    /* --- EL CAMBIO CLAVE: APLICAR LA ANIMACIÓN --- */
+    /* Usamos: respirarRobot (nombre), 5s (lento), ease-in-out (suave), infinite (bucle) */
+    animation: respirarRobot 5s ease-in-out infinite;
+    
+    /* Le decimos que la animación ocurra desde su base (pies) para que no flote */
+    transform-origin: bottom center;
+}
+
+
+/* El Globo de Texto (Reusando estilo RPG pero adaptado) */
+.robot-speech-bubble {
+    position: absolute;
+    bottom: 100%; /* Flota por encima del robot */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    border: 3px solid #00bcd4;
+    border-radius: 15px;
+    padding: 15px;
+    width: 250px;
+    min-height: 80px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    z-index: 2;
+    margin-bottom: 20px;
+    
+    /* Efecto de desvanecimiento para cuando desaparezca */
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Ocultar el globo */
+.robot-speech-bubble.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* El piquito del globo (apuntando hacia abajo) */
+.robot-speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 15px 10px 0 10px;
+    border-style: solid;
+    border-color: #00bcd4 transparent transparent transparent;
+}
+.robot-speech-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 12px 8px 0 8px;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+    z-index: 1;
+}
+
+/* El texto retro */
+.robot-speech-text {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    color: #004085;
+    font-weight: bold;
+    line-height: 1.4;
+    text-align: center;
+}
+
+/* =======================================================
+   TRANSICIÓN CLÁSICA 8-BITS (Desvanecimiento desde negro)
+======================================================== */
+.fade-in-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000000; /* Negro puro total */
+    z-index: 9999; /* Asegura que esté por encima de TODO (robot, máquina, etc) */
+    pointer-events: none; /* Evita que la capa invisible bloquee tus clics después */
+    
+    /* Animación: dura 1.5 segundos, suave, y se queda en el estado final (forwards) */
+    animation: desvanecerCapaNegra 1.5s ease-out forwards;
+}
+
+@keyframes desvanecerCapaNegra {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        visibility: hidden; /* Se apaga por completo para no estorbar */
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =======================================================
+   BOTÓN ARCADE (Para avanzar de nivel)
+======================================================== */
+.boton-arcade tw-link {
+    display: inline-block;
+    background-color: #004085; /* Azul institucional */
+    color: #ffffff !important;
+    padding: 1.5vh 3vw;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 2.2vh;
+    text-decoration: none;
+    border: 2px solid #00bcd4; /* Borde neón */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+.boton-arcade tw-link:hover {
+    background-color: #00bcd4;
+    color: #004085 !important;
+    transform: scale(1.05); /* Efecto de crecimiento al apuntar */
+}
+
+
+
+
+
+
+/* =======================================================
+   NIVEL 2: D-PAD (Cruceta Direccional Arcade)
+======================================================== */
+.dpad-container {
+    display: grid;
+    grid-template-columns: 4.5vh 4.5vh 4.5vh;
+    grid-template-rows: 4.5vh 4.5vh 4.5vh;
+    gap: 0.1vh; 
+    justify-content: center;
+    margin-top: 2vh; 
+}
+
+/* Posiciones exactas en la cuadrícula de 3x3 */
+.btn-up    { grid-column: 2; grid-row: 1; }
+.btn-left  { grid-column: 1; grid-row: 2; }
+.btn-right { grid-column: 3; grid-row: 2; }
+.btn-down  { grid-column: 2; grid-row: 3; }
+
+/* Estilo de los botones direccionales */
+.dpad-btn tw-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: #2c3e50;
+    color: #00bcd4 !important;
+    font-size: 4vh; /* Tamaño de las flechas */
+    font-weight: bold;
+    border-radius: 15px;
+    border: 3px solid #1a252f;
+    box-shadow: 0 6px 0 #11181f, 0 10px 15px rgba(0,0,0,0.5); /* Efecto 3D de botón físico */
+    text-decoration: none;
+    transition: all 0.1s ease;
+}
+
+/* Efecto al presionar el botón (se hunde) */
+.dpad-btn tw-link:active {
+    transform: translateY(6px);
+    box-shadow: 0 0px 0 #11181f, 0 2px 5px rgba(0,0,0,0.5);
+}
+
+/* =======================================================
+   NIVEL 2: LETRA "E" DINÁMICA
+======================================================== */
+.letra-snellen {
+    transition: all 0.5s ease-in-out; /* Animación suave al girar o encogerse */
+    filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.2));
+}
+
+
+
+
+
+
+
